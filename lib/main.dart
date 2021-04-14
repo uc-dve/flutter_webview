@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter_webview/webview_test.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() => runApp(MyApp());
 
@@ -21,15 +23,15 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-  final String title;
+  MyHomePage({Key? key, this.title}) : super(key: key);
+  final String? title;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String dirPath;
+  String? dirPath;
 
   @override
   void initState() {
@@ -44,7 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  Future<File> _downloadFile({String url, String filename}) async {
+  Future<File> _downloadFile({required String url, String? filename}) async {
     var httpClient = new HttpClient();
     var request = await httpClient.getUrl(Uri.parse(url));
     var response = await request.close();
@@ -55,11 +57,17 @@ class _MyHomePageState extends State<MyHomePage> {
     return file;
   }
 
+  String link =
+      "https://ucertifylearn.page.link/?link=https://www.ucertify.com/?jhghjgjgj&apn=com.flutter.ucertifyLearn&isi=1505460373&ibi=com.flutter.ucertifyLearn";
+  void _launchURL(_url) async => await canLaunch(_url)
+      ? await launch(_url)
+      : throw 'Could not launch $_url';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(widget.title!),
       ),
       body: Center(
         child: Column(
@@ -86,10 +94,25 @@ class _MyHomePageState extends State<MyHomePage> {
             InkWell(
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => WebviewPage(dirPath)));
+                    builder: (context) => WebviewPage(dirPath!)));
               },
               child: SizedBox(
                   height: 50, width: 100, child: Text("then Load Webview")),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => WebviewTest()));
+              },
+              child: Text("LTI link testing"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                link =
+                    "https://www.ucertify.com/lti.php?crn=FC0-U51-complete&open_in_app=1";
+                _launchURL(link);
+              },
+              child: Text('launch url'),
             ),
           ],
         ),
@@ -99,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class WebviewPage extends StatefulWidget {
-  String dirPath;
+  final String dirPath;
   WebviewPage(this.dirPath);
 
   @override
@@ -156,7 +179,6 @@ class WebviewPageStete extends State<WebviewPage> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
       appBar: AppBar(
         title: Text("Webview"),
